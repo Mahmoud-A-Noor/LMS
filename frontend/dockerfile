@@ -1,0 +1,27 @@
+# Stage 1: Build
+FROM node:18-alpine AS builder
+WORKDIR /app/frontend
+
+# Copy package files and install dependencies
+COPY package.json package-lock.json ./  
+RUN npm install  
+
+# Copy all files and build Next.js
+COPY . .  
+RUN npm run build  
+
+# Stage 2: Production
+FROM node:18-alpine
+WORKDIR /app/frontend
+
+# Copy built files from builder
+COPY --from=builder /app/frontend/package.json ./  
+COPY --from=builder /app/frontend/node_modules ./node_modules  
+COPY --from=builder /app/frontend/.next ./.next  
+COPY --from=builder /app/frontend/public ./public  
+
+# Expose port
+EXPOSE 3000  
+
+# Start the Next.js production server
+CMD ["npm", "run", "start"]
