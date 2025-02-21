@@ -1,16 +1,4 @@
-import { PrimaryKey } from '@mikro-orm/core';
-import { IsEmail, IsOptional, MinLength } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateUserDto } from './create-user.dto';
 
-export class UpdateUserDto {
-
-
-  @IsEmail()
-  email?: string;
-
-  @IsOptional()
-  @MinLength(6)
-  password?: string;
-
-  @IsOptional()
-  isActive?: boolean;
-}
+export class UpdateUserDto extends PartialType(CreateUserDto) {} // using PartialType to make all fields optional

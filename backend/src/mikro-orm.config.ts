@@ -24,6 +24,6 @@ export default defineConfig({
     path: 'migrations', // Path to migration files
     pathTs: 'migrations', // Path for TS migration files
   },
-  // flushMode: "commit",
+  flushMode: "auto",
   extensions: [Migrator, EntityGenerator, SeedManager],
 });
