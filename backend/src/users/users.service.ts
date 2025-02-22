@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/mysql';
+import {Request} from "express"
 
 @Injectable()
 export class UsersService {
@@ -24,6 +25,10 @@ export class UsersService {
 
   async findOne(id: string): Promise<User | null> {
     return this.userRepository.findOne({ id });
+  }
+
+  async findMe(req: any){
+    return this.userRepository.findOne({id: req.user.id})
   }
 
   async findByEmail(email: string): Promise<User | null> {

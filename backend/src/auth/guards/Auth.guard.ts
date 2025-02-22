@@ -6,7 +6,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const { path, method } = request;
-    if (path.startsWith('/auth/login') || path.startsWith('/auth/register')) {
+    if (path.startsWith('/auth/login') || path.startsWith('/auth/register') || path.startsWith('/auth/refresh-token')) {
       return true;
     }
     

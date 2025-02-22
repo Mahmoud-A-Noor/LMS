@@ -23,11 +23,14 @@ export class User {
   @Property({ hidden: true, type: 'text' })
   password!: string;
 
-  @Enum({ items: () => UserRole, default: UserRole.USER })
+  @Enum({ items: () => UserRole, default: UserRole.USER})
   role: UserRole;
 
   @Property({ type: 'text', nullable: true })
   imageUrl: string;
+ 
+  @Property({ type: 'text', nullable: true, hidden: true })
+  refreshToken: string;
 
   @Property({ type: 'timestamp', nullable: true })
   deletedAt: Date;

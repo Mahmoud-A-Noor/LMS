@@ -553,13 +553,13 @@
         },
         "email": {
           "name": "email",
-          "type": "varchar(255)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "length": null,
+          "mappedType": "text"
         },
         "password": {
           "name": "password",
@@ -587,6 +587,16 @@
         },
         "image_url": {
           "name": "image_url",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "refresh_token": {
+          "name": "refresh_token",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -703,7 +713,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "datetime"
         },

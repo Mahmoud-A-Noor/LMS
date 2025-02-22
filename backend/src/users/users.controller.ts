@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, InternalServerErrorException, UseGuards, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, HttpCode, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from 'src/auth/guards/Auth.guard';
 import { RolesGuard } from 'src/auth/guards/Role.guard';
 import { Roles } from 'src/auth/decorators/Role.decorator';
 import { UserRole } from '../common/enums/user-role.enum';
+import { Request } from "express"
 
 @Controller('users')
 export class UsersController {
@@ -23,6 +23,11 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('/me')
+  findMe(@Req() req: Request) {
+    return this.usersService.findMe(req);
   }
 
   @Get(':id')
