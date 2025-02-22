@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { User } from "../../users/entities/user.entity";
-import { Lesson } from "./lesson.entity";
+import { Lesson } from "../../lessons/entities/lesson.entity";
 
 @Entity({ tableName: 'user_course_access' })
 export class UserLessonComplete {

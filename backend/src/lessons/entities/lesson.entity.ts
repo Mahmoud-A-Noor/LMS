@@ -1,11 +1,6 @@
 import { Entity, PrimaryKey, Property, ManyToOne, Enum } from '@mikro-orm/core';
 import { CourseSection } from '../../courses/entities/courseSection.entity';
-
-export enum LessonStatus {
-    PUBLIC = 'public',
-    PRIVATE = 'private',
-    PREVIEW = 'preview'
-}
+import { LessonStatus } from '../../common/enums/lesson-status.enum';
 
 @Entity({ tableName: 'lessons' })
 export class Lesson {

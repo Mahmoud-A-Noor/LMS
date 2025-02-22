@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, InternalServerErrorException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, InternalServerErrorException, UseGuards, HttpCode } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -36,11 +36,9 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id') id: string) {
-    const result = await this.usersService.remove(id);
-    if (!result) throw new InternalServerErrorException("User could not be deleted");
-
-    return { success: true, message: 'User successfully deleted' };
+    return await this.usersService.remove(id);
   }
 }
 

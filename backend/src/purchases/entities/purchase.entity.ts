@@ -21,7 +21,7 @@ export class Purchase {
     @Property({type: "string", nullable: false, unique: true})
     stripeSessionId!: string;
     
-    @Property({ type: 'timestamp' })
+    @Property({ type: 'timestamp', nullable: true})
     refundedAt: Date;
 
     @Property({ type: 'timestamp', defaultRaw: 'CURRENT_TIMESTAMP' })

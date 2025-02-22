@@ -14,6 +14,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/Auth.guard';
+import { UserCourseAccessModule } from './user-course-access/user-course-access.module';
+import { UserLessonCompleteModule } from './user-lesson-complete/user-lesson-complete.module';
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { JwtAuthGuard } from './auth/guards/Auth.guard';
     PurchasesModule,
     ProductsModule,
     UsersModule,
-    AuthModule
+    AuthModule,
+    UserCourseAccessModule,
+    UserLessonCompleteModule
   ],
   controllers: [AppController],
   providers: [AppService,

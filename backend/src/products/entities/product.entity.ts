@@ -1,10 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToMany, Collection, Enum } from '@mikro-orm/core';
 import { Course } from '../../courses/entities/course.entity';
+import { ProductStatus } from '../../common/enums/product-status.enum';
 
-export enum ProductStatus {
-    PUBLIC = 'public',
-    PRIVATE = 'private',
-}
 
 @Entity({ tableName: 'products' })
 export class Product {
@@ -18,10 +15,10 @@ export class Product {
     description!: string;
 
     @Property()
-    image_url!: string;
+    imageUrl!: string;
 
     @Property({ type: 'decimal', precision: 10, scale: 2 })
-    price_in_dollars!: number;
+    priceInDollars!: number;
 
     @Enum({ items: () => ProductStatus, default: ProductStatus.PRIVATE })
     status: ProductStatus = ProductStatus.PRIVATE;

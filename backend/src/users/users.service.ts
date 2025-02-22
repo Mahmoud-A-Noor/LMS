@@ -40,13 +40,11 @@ export class UsersService {
     return user;
   }
 
-  async remove(id: string): Promise<boolean> {
-    const user = await this.findOne(id);
-    if (!user) throw new NotFoundException(`User could not be found`);
-
+  async remove(id: string) {
     try {
-        await this.userRepository.getEntityManager().removeAndFlush(user);
-        return true;
+        const user = await this.findOne(id);
+        if (!user) throw new NotFoundException(`User could not be found`);
+        return await this.userRepository.getEntityManager().removeAndFlush(user);
       } catch (error) {
         throw new InternalServerErrorException('An error occurred while deleting the user');
       }
