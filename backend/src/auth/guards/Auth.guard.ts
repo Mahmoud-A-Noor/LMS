@@ -5,15 +5,25 @@ import { AuthGuard } from '@nestjs/passport';
 export class JwtAuthGuard extends AuthGuard('jwt') {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const { path, method } = request;
-    if (path.startsWith('/auth/login') || path.startsWith('/auth/register') || path.startsWith('/auth/refresh-token')) {
+
+    if (
+      request.path.startsWith('/auth/login') ||
+      request.path.startsWith('/auth/register') ||
+      request.path.startsWith('/auth/refresh-token')
+    ) {
       return true;
     }
+
+    const token = request.cookies?.accessToken;
+    if (!token) {
+      throw new UnauthorizedException('Access token not found.');
+    }
+
+    request.headers.authorization = `Bearer ${token}`;
     
-    return super.canActivate(context); // Calls the default JWT guard
+    return super.canActivate(context);
   }
 
-  // here we override the handleRequest method to throw a custom error (Optional)
   handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
       throw new UnauthorizedException('You need to log in to access this resource.');

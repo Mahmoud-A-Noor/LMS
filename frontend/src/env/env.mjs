@@ -7,9 +7,10 @@ export const env = createEnv({
     // JWT_SECRET: z.string(),
   },
   client: {
-    API_URL: z.string().url(),
+    NEXT_PUBLIC_API_URL: z.string().url(),
   },
   runtimeEnv: {
-    API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
+  clientPrefix: "NEXT_PUBLIC_",
 });

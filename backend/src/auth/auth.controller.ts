@@ -4,6 +4,8 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { parseDurationToMs } from '../common/utils/parseDurationToMs';
+import { AuthenticatedRequest } from '../common/interfaces/authenticatedRequest';
 
 @Controller('auth')
 export class AuthController {
@@ -14,45 +16,59 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: LoginDto, @Res() res: Response) {
-    const { accessToken, refreshToken } = await this.authService.validateUser(body.email, body.password);
+    const { accessToken, refreshToken, user } = await this.authService.validateUser(body.email, body.password);
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      sameSite: 'strict',
+      maxAge: parseDurationToMs(this.configService.get('JWT_ACCESS_EXPIRES_IN')),
+    });
+  
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'strict',
+      maxAge: parseDurationToMs(this.configService.get('JWT_REFRESH_EXPIRES_IN')),
     });
-
-    return res.json({ accessToken });
+    
+    return res.json({ user });
   }
 
   @Post('register')
-  async register(@Body() body: RegisterDto, @Res() res: Response) {
-    const { accessToken, refreshToken } = await this.authService.register(body);
+  async register(@Body() body: RegisterDto) {
+    return this.authService.register(body);
+  }
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
-    });
-
-    return res.json({ accessToken });
+  @Post('logout')
+  async logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
+    return this.authService.logout(req.user.id, res);
   }
 
   @Post('refresh-token')
   async refreshTokens(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies?.refresh_token;
-    if (!refreshToken) {
+    const oldRefreshToken = req.cookies?.refreshToken;
+    if (!oldRefreshToken) {
       throw new UnauthorizedException('Refresh token not found');
     }
   
-    const tokens = await this.authService.refreshAccessToken(refreshToken);
+    const { accessToken, refreshToken } = await this.authService.refreshAccessToken(oldRefreshToken);
   
-    res.cookie('refreshToken', tokens.refreshToken, {
+    
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'strict',
+      maxAge: parseDurationToMs(this.configService.get('JWT_ACCESS_EXPIRES_IN')),
     });
   
-    return res.json({ accessToken: tokens.accessToken });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      sameSite: 'strict',
+      maxAge: parseDurationToMs(this.configService.get('JWT_REFRESH_EXPIRES_IN')),
+    });
+
+    return res.json({ success: true });
   }
 }

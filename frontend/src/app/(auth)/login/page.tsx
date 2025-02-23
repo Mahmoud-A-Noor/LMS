@@ -1,10 +1,11 @@
-import LoginForm from '@/app/components/LoginForm'
-import React from 'react'
+import ParticleBackground from "@/components/background/ParticleBackground";
+import LoginForm from "@/components/forms/LoginForm";
 
-const page = () => {
+export default function LoginPage() {
   return (
-    <LoginForm />
-  )
+    <div className="flex items-center justify-center h-screen w-screen bg-gray-100 dark:bg-gray-900">
+      <ParticleBackground />
+      <LoginForm />
+    </div>
+  );
 }
-
-export default page

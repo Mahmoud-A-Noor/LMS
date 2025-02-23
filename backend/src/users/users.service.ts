@@ -8,6 +8,12 @@ import {Request} from "express"
 
 @Injectable()
 export class UsersService {
+  findById(userId: string) {
+    throw new Error('Method not implemented.');
+  }
+  updateRefreshToken(userId: string, arg1: null) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
@@ -28,7 +34,12 @@ export class UsersService {
   }
 
   async findMe(req: any){
-    return this.userRepository.findOne({id: req.user.id})
+    return this.userRepository.findOne(
+      { id: req.user.id },
+      {
+        exclude: ["deletedAt", "createdAt", "updatedAt"], // exclude unnecessary fields
+      }
+    );
   }
 
   async findByEmail(email: string): Promise<User | null> {

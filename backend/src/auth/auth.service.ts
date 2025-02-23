@@ -6,7 +6,9 @@ import { RegisterDto } from './dto/register.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
+import * as bcrypt from 'bcryptjs';
+import { Response } from "express"
+
 
 @Injectable()
 export class AuthService {
@@ -35,10 +37,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.generateTokens(user);
-    await this.updateRefreshToken(user.id, tokens.refreshToken);
-    
-    return tokens;
+    const {refreshToken, accessToken} = await this.generateTokens(user);
+    await this.updateRefreshToken(user.id, refreshToken);
+    return {refreshToken, accessToken, user};
   }
 
   async register(registerDto: RegisterDto) {
@@ -48,19 +49,43 @@ export class AuthService {
     }
 
     const user = this.userRepository.create(registerDto);
-    const tokens = await this.generateTokens(user);
-
-    user.refreshToken = tokens.refreshToken;
     await this.userRepository.getEntityManager().persistAndFlush(user);
 
-    return tokens;
+    return { success: true }
+  }
+
+  async logout(userId: string, res: Response) {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    // Clear the refresh token from the database (if stored)
+    await this.updateRefreshToken(userId, null);
+
+    // Clear the tokens from cookies
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    return res.json({ message: 'Logged out successfully' });
   }
 
   async refreshAccessToken(oldRefreshToken: string) {
     const decoded = this.jwtService.verify(oldRefreshToken, this.jwtRefreshOptions);
 
     const user = await this.userRepository.findOne({ id: decoded.id });
-    if (!user || user.refreshToken !== oldRefreshToken) {
+    console.log(user.refreshToken)
+    if (!user || !bcrypt.compare(oldRefreshToken, user.refreshToken)) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
@@ -70,9 +95,10 @@ export class AuthService {
     return tokens;
   }
 
+  
   // helper functions
   
-  async generateTokens(user: User) {
+  private async generateTokens(user: User) {
     const payload = { id: user.id, email: user.email, role: user.role };
 
     return {
@@ -81,8 +107,15 @@ export class AuthService {
     };
   }
   
-  private async updateRefreshToken(userId: string, refreshToken: string) {
-    await this.userRepository.nativeUpdate({ id: userId }, { refreshToken });
+  private async updateRefreshToken(userId: string, refreshToken: string | null) {
+    // in case user logged out
+    if (!refreshToken) {
+      await this.userRepository.nativeUpdate({ id: userId }, { refreshToken: null });
+      return;
+    }
+
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.nativeUpdate({ id: userId }, { refreshToken: hashedRefreshToken });
   }
 
 }
