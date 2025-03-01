@@ -8,12 +8,6 @@ import {Request} from "express"
 
 @Injectable()
 export class UsersService {
-  findById(userId: string) {
-    throw new Error('Method not implemented.');
-  }
-  updateRefreshToken(userId: string, arg1: null) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,

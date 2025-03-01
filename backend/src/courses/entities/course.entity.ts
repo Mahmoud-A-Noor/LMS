@@ -11,11 +11,11 @@ export class Course {
     @Property({ type: 'varchar', length: 255 })
     name!: string;
 
+    @Property({ type: 'text' })
+    description!: string;
+
     @Enum({ items: () => CourseStatus, default: CourseStatus.PRIVATE })
     status: CourseStatus = CourseStatus.PRIVATE;
-
-    @Property({ type: 'int' })
-    order!: number;
 
     @Property({ type: 'timestamp', defaultRaw: 'CURRENT_TIMESTAMP' })
     createdAt: Date = new Date();

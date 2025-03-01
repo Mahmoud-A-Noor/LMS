@@ -29,6 +29,13 @@ export class LessonsController {
 
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
+  @Put('/order')
+  updateOrder(@Body() body: {newOrder: string[]}) {
+    return this.lessonsService.updateOrder(body.newOrder);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Put(':id')
   update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
     return this.lessonsService.update(id, updateLessonDto);

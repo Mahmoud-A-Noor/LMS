@@ -2,7 +2,7 @@ import { User } from "./user";
 
 
 export interface AuthState {
-    user: User | undefined | null;
+    user: User | null;
     loading: boolean;
     setUser: (user: User | null) => void;
     hydrateAuth: () => void;

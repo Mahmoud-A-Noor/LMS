@@ -23,6 +23,16 @@
           "length": 255,
           "mappedType": "string"
         },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
         "status": {
           "name": "status",
           "type": "enum('public','private')",
@@ -36,16 +46,6 @@
             "private"
           ],
           "mappedType": "enum"
-        },
-        "order": {
-          "name": "order",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "integer"
         },
         "created_at": {
           "name": "created_at",
@@ -115,9 +115,33 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('public','private')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'private'",
+          "enumItems": [
+            "public",
+            "private"
+          ],
+          "mappedType": "enum"
+        },
+        "order": {
+          "name": "order",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
         },
         "created_at": {
           "name": "created_at",
@@ -243,6 +267,7 @@
           "primary": false,
           "nullable": false,
           "length": null,
+          "default": "0",
           "mappedType": "integer"
         },
         "status": {

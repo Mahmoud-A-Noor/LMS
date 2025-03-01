@@ -16,8 +16,8 @@ export class Lesson {
     @Property({ type: 'text' })
     youtubeVideoId!: string;
 
-    @Property({ type: 'int' })
-    order!: number;
+    @Property({ type: "integer" })
+    order: number = 0;
 
     @Enum({items: () => LessonStatus, default: LessonStatus.PRIVATE})
     status: LessonStatus = LessonStatus.PRIVATE;
@@ -32,4 +32,5 @@ export class Lesson {
   
   @ManyToOne(() => CourseSection, {deleteRule: 'cascade'})
   courseSection!: CourseSection;
+  
 }

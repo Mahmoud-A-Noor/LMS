@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import AuthCard from "./AuthCard";
+import AuthCard from "./components/AuthCard";
 import { loginSchema } from "./validation/login";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/hooks/useToast";
@@ -28,9 +28,9 @@ export default function LoginForm() {
     setLoading(true);
     try {
       await login(data.email, data.password)
-      window.location.href = "/";
-    } catch (error) {
-      alertError("Login failed, please try again later");
+      window.location.href = "/dashboard";
+    } catch (error: any) {
+      alertError(error as string);
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,7 @@ export default function LoginForm() {
 
   return (
     <AuthCard title="Login">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-7">
         <div>
           <Label>Email</Label>
           <Input type="email" {...register("email")} placeholder="Enter your email" />

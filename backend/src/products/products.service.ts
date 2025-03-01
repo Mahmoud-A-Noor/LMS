@@ -5,6 +5,7 @@ import { Product } from './entities/product.entity';
 import { Course } from '../courses/entities/course.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { EntityManager } from '@mikro-orm/mysql';
 
 @Injectable()
 export class ProductsService {
@@ -12,7 +13,8 @@ export class ProductsService {
         @InjectRepository(Product)
         private readonly productRepository: EntityRepository<Product>,
         @InjectRepository(Course)
-        private readonly courseRepository: EntityRepository<Course>
+        private readonly courseRepository: EntityRepository<Course>,
+        private readonly em: EntityManager
     ) {}
 
 
@@ -30,11 +32,35 @@ export class ProductsService {
         }
     }
 
-    async findAll(): Promise<Product[]> {
+    async findAll(): Promise<any[]> {
         try {
-            return await this.productRepository.findAll({
+            // Fetch all products with related courses
+            const products = await this.productRepository.findAll({
                 populate: ['courses']
             });
+    
+            // Fetch distinct course count and distinct client count for each product
+            const knex = this.em.getConnection().getKnex();
+
+            const productStats = await knex('products as p')
+                .leftJoin('product_courses as pc', 'p.id', 'pc.product_id')
+                .leftJoin('courses as c', 'pc.course_id', 'c.id')
+                .leftJoin('purchases as pur', 'p.id', 'pur.product_id')
+                .select('p.id')
+                .countDistinct({ courseCount: 'c.id' })  
+                .countDistinct({ clientCount: 'pur.user_id' }) 
+                .groupBy('p.id');
+                console.log(productStats)
+            // Map the statistics to the products
+            return products.map(product => {
+                const stats = productStats.find(stat => stat.id === product.id) || { courseCount: 0, clientCount: 0 };
+                return {
+                    ...product,
+                    courseCount: Number(stats.courseCount),
+                    clientCount: Number(stats.clientCount),
+                };
+            });
+    
         } catch (error) {
             throw new InternalServerErrorException('Failed to retrieve products');
         }
@@ -42,6 +68,7 @@ export class ProductsService {
 
     async create(createProductDto: CreateProductDto): Promise<Product> {
         try {
+            console.log(createProductDto)
             const { courseIds, ...productData } = createProductDto;
             const product = this.productRepository.create(productData);
 
@@ -120,6 +147,7 @@ export class ProductsService {
             const product = await this.findOne(id);
             await this.productRepository.getEntityManager().removeAndFlush(product);
         } catch (error) {
+            console.log(error)
             throw new InternalServerErrorException('An error occurred while deleting the product');
         }
     }

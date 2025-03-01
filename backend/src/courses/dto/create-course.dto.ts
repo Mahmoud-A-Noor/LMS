@@ -6,11 +6,12 @@ export class CreateCourseDto {
     @IsNotEmpty()
     name: string;
 
+    @IsString()
+    @IsNotEmpty()
+    description: string;
+
     @IsEnum(CourseStatus)
     @IsOptional()
     status: CourseStatus;
 
-    @IsInt()
-    @IsNotEmpty()
-    order: number;
 }

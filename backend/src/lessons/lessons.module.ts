@@ -8,5 +8,6 @@ import { Lesson } from './entities/lesson.entity';
   imports: [MikroOrmModule.forFeature([Lesson])],
   controllers: [LessonsController],
   providers: [LessonsService],
+  exports: [LessonsService]
 })
 export class LessonsModule {}

@@ -23,7 +23,6 @@ export class CreateProductDto {
     status?: ProductStatus;
 
     @IsArray()
-    @IsUUID('4', { each: true })
     @IsOptional()
     courseIds?: string[];
 }

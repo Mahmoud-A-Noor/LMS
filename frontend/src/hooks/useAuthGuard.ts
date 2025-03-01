@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function useAuthGuard() {
-  const { user, loading } = useAuthStore(); // ✅ Now tracking loading state
+  const { user, loading } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return; // ✅ Prevent redirecting while Zustand is hydrating
+    if (loading) return;
     if (user === null) {
       router.replace("/401");
     }

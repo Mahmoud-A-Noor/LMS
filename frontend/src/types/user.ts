@@ -1,8 +1,9 @@
+import { UserType } from "@/enums/UserEnum";
 
 export interface User {
     id: string;
     username: string;
     email: string;
-    role: 'admin' | 'user';
+    role: UserType;
     imageUrl: string | null
   }

@@ -29,10 +29,18 @@ export class CoursesSectionController {
 
     @UseGuards(RolesGuard)
     @Roles(UserRole.ADMIN)
+    @Put('/order')
+    updateOrder(@Body() body: {newOrder: string[]}) {
+        return this.coursesSectionService.updateOrder(body.newOrder);
+    }
+
+    @UseGuards(RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Put(':id')
     update(@Param('id') id: string, @Body() updateCourseSectionDto: UpdateCourseSectionDto) {
         return this.coursesSectionService.update(id, updateCourseSectionDto);
     }
+
 
     @UseGuards(RolesGuard)
     @Roles(UserRole.ADMIN)

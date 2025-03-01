@@ -10,7 +10,7 @@ export class LessonsService {
   constructor(private readonly em: EntityManager) {}
 
   async create(createLessonDto: CreateLessonDto) {
-    const courseSection = await this.em.findOne(CourseSection, { id: createLessonDto.courseSectionId });
+    const courseSection = await this.em.findOne(CourseSection, { id: createLessonDto.sectionId });
     if (!courseSection) {
         throw new NotFoundException('Course section not found');
     }
@@ -39,8 +39,8 @@ export class LessonsService {
   async update(id: string, updateLessonDto: UpdateLessonDto) {
     const lesson = await this.findOne(id);
 
-    if (updateLessonDto.courseSectionId) {
-      const courseSection = await this.em.findOne(CourseSection, { id: updateLessonDto.courseSectionId });
+    if (updateLessonDto.sectionId) {
+      const courseSection = await this.em.findOne(CourseSection, { id: updateLessonDto.sectionId });
       if (!courseSection) {
         throw new NotFoundException('Course section not found');
       }
@@ -50,6 +50,21 @@ export class LessonsService {
     this.em.assign(lesson, updateLessonDto);
     await this.em.flush();
     return lesson;
+  }
+
+  
+  async updateOrder(newOrder: string[]) {
+    let updatedLessons = []
+    for (let index = 0; index < newOrder.length; index++) {
+      const id = newOrder[index];
+      const sectionLesson = await this.findOne(id);
+      if (!sectionLesson) throw new NotFoundException(`Section Lesson with ID ${id} couldn't be found`);
+      sectionLesson.order = index;
+      updatedLessons.push(sectionLesson);
+    }
+    await this.em.flush();
+    
+    return updatedLessons
   }
 
   async remove(id: string) {

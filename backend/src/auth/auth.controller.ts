@@ -16,23 +16,24 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: LoginDto, @Res() res: Response) {
-    const { accessToken, refreshToken, user } = await this.authService.validateUser(body.email, body.password);
+      const { accessToken, refreshToken, user } = await this.authService.validateUser(body.email, body.password);
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
-      maxAge: parseDurationToMs(this.configService.get('JWT_ACCESS_EXPIRES_IN')),
-    });
-  
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
-      maxAge: parseDurationToMs(this.configService.get('JWT_REFRESH_EXPIRES_IN')),
-    });
+      res.cookie('accessToken', accessToken, {
+        path: "/",
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === 'production',
+        // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: parseDurationToMs(this.configService.get('JWT_ACCESS_EXPIRES_IN')),
+      });
     
-    return res.json({ user });
+      res.cookie('refreshToken', refreshToken, {
+        path: "/",
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === 'production',
+        // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: parseDurationToMs(this.configService.get('JWT_REFRESH_EXPIRES_IN')),
+      });
+      return res.status(200).json({ user });
   }
 
   @Post('register')

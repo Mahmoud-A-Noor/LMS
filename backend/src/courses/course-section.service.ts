@@ -23,7 +23,7 @@ export class CoursesSectionService {
     }
     const courseSection = this.courseSectionRepository.create({
         name: createCourseSectionDto.name,
-        description: createCourseSectionDto.description,
+        status: createCourseSectionDto.status,
         course,
     });
     await this.courseSectionRepository.getEntityManager().flush();
@@ -40,12 +40,25 @@ export class CoursesSectionService {
 
   async update(id: string, updateCourseSectionDto: UpdateCourseSectionDto): Promise<CourseSection | null> {
     const courseSection = await this.findOne(id);
-    if (!courseSection) return null;
+    if (!courseSection) throw new NotFoundException("Course Section couldn't be found");;
 
     this.courseSectionRepository.assign(courseSection, updateCourseSectionDto);
     await this.courseSectionRepository.getEntityManager().flush();
     
     return courseSection;
+  }
+  async updateOrder(newOrder: string[]) {
+    let updatedSections = []
+    for (let index = 0; index < newOrder.length; index++) {
+      const id = newOrder[index];
+      const courseSection = await this.findOne(id);
+      if (!courseSection) throw new NotFoundException(`Course Section with ID ${id} couldn't be found`);
+      courseSection.order = index;
+      updatedSections.push(courseSection);
+    }
+    await this.courseSectionRepository.getEntityManager().flush();
+    
+    return updatedSections
   }
 
   async remove(id: string) {

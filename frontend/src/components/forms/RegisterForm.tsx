@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import AuthCard from "./AuthCard";
+import AuthCard from "./components/AuthCard";
 import { registerSchema } from "./validation/register";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/hooks/useToast";
@@ -31,8 +31,7 @@ export default function RegisterForm() {
       alertSuccess("Registration successful!");
       window.location.href = "/login";
     } catch (error) {
-      console.error("Registration failed:", error);
-      alertError("Registration failed. Please try again.");
+      alertError(error as string);
     } finally {
       setLoading(false);
     }

@@ -15,7 +15,7 @@ export class CreateLessonDto {
     youtubeVideoId: string;
 
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     order: number;
 
     @IsEnum(LessonStatus)
@@ -24,5 +24,5 @@ export class CreateLessonDto {
 
     @IsString()
     @IsNotEmpty()
-    courseSectionId: string;
+    sectionId: string;
 }

@@ -1,19 +1,18 @@
 "use client";
-import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useAuthGuard } from "./useAuthGuard";
 
 export function useRoleGuard(allowedRoles: string[]) {
-  const { user } = useAuthStore();
+  const { user, loading } = useAuthGuard();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
-      router.replace("/401"); // Not logged in
-    } else if (!allowedRoles.includes(user.role)) {
-      router.replace("/403"); // Not authorized
+    if (loading) return;
+    if (user && !allowedRoles.includes(user.role)) {
+      router.replace("/403");
     }
   }, [user, router, allowedRoles]);
 
-  return { user };
+  return { user, loading };
 }
