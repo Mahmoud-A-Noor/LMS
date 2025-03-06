@@ -6,6 +6,10 @@ import { Course } from '../courses/entities/course.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { EntityManager } from '@mikro-orm/mysql';
+import { ProductStatus } from '../common/enums/product-status.enum';
+import { CourseStatus } from '../common/enums/course-status.enum';
+import { SectionStatus } from '../common/enums/section-status';
+import { LessonStatus } from '../common/enums/lesson-status.enum';
 
 @Injectable()
 export class ProductsService {
@@ -17,20 +21,61 @@ export class ProductsService {
         private readonly em: EntityManager
     ) {}
 
-
-    async findOne(id: string): Promise<Product> {
-        try {
-            const product = await this.productRepository.findOne({ id }, {
-                populate: ['courses']
-            });
-            if (!product) {
-                throw new NotFoundException('Product not found');
-            }
-            return product;
-        } catch (error) {
+    async findById(productId: string): Promise<Product> {
+        try{
+            const product = await this.productRepository.findOne({id: productId});
+            if(!product) throw new NotFoundException('Product not found')
+            return product
+        }catch(error){
+            console.log(error)
             throw new InternalServerErrorException('Failed to retrieve the product');
         }
     }
+    async findOne(id: string): Promise<Product | Record<string, any>> {
+        try {
+            const product = await this.productRepository.findOne(id, {
+                populate: ['courses.sections.lessons'], // Fetch all relationships
+                orderBy: { 
+                    courses: {
+                        sections: {
+                            order: 'asc',
+                            lessons: {
+                                order: 'asc'
+                            }
+                        }
+                    }
+                }
+            });
+        
+            if (!product) {
+                throw new NotFoundException('Product not found');
+            }
+    
+            // Filter courses without modifying the database
+            const filteredCourses = product.courses
+                .filter(course => course.status === CourseStatus.PUBLIC)
+                .map(course => {
+                    return {
+                        ...course,
+                        sections: course.sections
+                            .filter(section => section.status === SectionStatus.PUBLIC)
+                            .map(section => ({
+                                ...section,
+                                lessons: section.lessons.filter(
+                                    lesson => lesson.status === LessonStatus.PUBLIC || lesson.status === LessonStatus.PREVIEW
+                                )
+                            }))
+                    };
+                });
+    
+            // Return a new object instead of modifying the entity directly
+            return { ...product, courses: filteredCourses };
+        } catch (error) {
+            console.error(error);
+            throw new InternalServerErrorException('Failed to retrieve the product');
+        }
+    }
+    
 
     async findAll(): Promise<any[]> {
         try {
@@ -66,9 +111,26 @@ export class ProductsService {
         }
     }
 
+    async findAllPublic(): Promise<any[]> {
+        try {
+            // Fetch all products with related courses
+            const products = await this.productRepository.findAll({
+                populate: ['courses'],
+                where: {
+                    status: ProductStatus.PUBLIC
+                },
+                orderBy: { name: 'asc' }
+            });
+
+            return products
+    
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to retrieve products');
+        }
+    }
+
     async create(createProductDto: CreateProductDto): Promise<Product> {
         try {
-            console.log(createProductDto)
             const { courseIds, ...productData } = createProductDto;
             const product = this.productRepository.create(productData);
 
@@ -89,7 +151,9 @@ export class ProductsService {
 
     async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
         try {
-            const product = await this.findOne(id);
+            const product = await this.productRepository.findOne(id, {
+                populate: ['courses.sections.lessons']
+            })
             const { courseIds, ...productData } = updateProductDto;
 
             this.productRepository.assign(product, productData);
@@ -105,7 +169,7 @@ export class ProductsService {
                 }
             }
 
-            await this.productRepository.getEntityManager().flush();
+            await this.productRepository.getEntityManager().persistAndFlush(product);
             return product;
         } catch (error) {
             throw new InternalServerErrorException('Failed to update the product');
@@ -114,13 +178,13 @@ export class ProductsService {
 
     async addCourses(productId: string, courseIds: string[]): Promise<Product> {
         try {
-            const product = await this.findOne(productId);
+            const product = await this.productRepository.findOne(productId, { populate: ['courses'] });
             const courses = await this.courseRepository.find({ id: { $in: courseIds } });
             if (courses.length !== courseIds.length) {
                 throw new BadRequestException('One or more courses could not be found');
             }
             product.courses.add(courses);
-            await this.productRepository.getEntityManager().flush();
+            await this.productRepository.getEntityManager().persistAndFlush(product);
             return product;
         } catch (error) {
             throw new InternalServerErrorException('Failed to add courses to the product');
@@ -129,11 +193,18 @@ export class ProductsService {
 
     async removeCourses(productId: string, courseIds: string[]): Promise<Product> {
         try {
-            const product = await this.findOne(productId);
+            const product = await this.productRepository.findOne(productId, {
+                populate: ['courses']
+            });
+            if (!product) {
+                throw new NotFoundException('Product not found');
+            }
+            
             const courses = await this.courseRepository.find({ id: { $in: courseIds } });
             if (courses.length !== courseIds.length) {
                 throw new BadRequestException('One or more courses could not be found');
             }
+            
             courses.forEach(course => product.courses.remove(course));
             await this.productRepository.getEntityManager().flush();
             return product;

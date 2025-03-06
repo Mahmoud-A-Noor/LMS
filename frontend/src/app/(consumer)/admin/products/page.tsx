@@ -1,10 +1,10 @@
-import CourseTable from '@/components/features/CourseTable'
+import CourseTable from '@/components/features/tables/CourseTable'
 import { Button } from '@/components/ui/button'
 import PageHeader from '@/components/ui/PageHeader'
 import Link from 'next/link'
 import React from 'react'
 import { serverApi } from '@/utils/serverApi'
-import ProductTable from '@/components/features/ProductTable'
+import ProductTable from '@/components/features/tables/ProductTable'
 
 
 const page = async() => {

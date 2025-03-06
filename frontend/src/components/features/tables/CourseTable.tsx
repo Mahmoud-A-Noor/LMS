@@ -1,11 +1,11 @@
 "use client"
 import React from 'react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table'
 import { formatPlural } from '@/utils/formatPlural'
-import { Button } from '../ui/button'
+import { Button } from '../../ui/button'
 import Link from 'next/link'
 import { Trash2Icon } from 'lucide-react'
-import ActionButton from '../common/ActionButton'
+import ActionButton from '../../common/ActionButton'
 import { useToast } from '@/hooks/useToast'
 import { useApi } from '@/hooks/useApi'
 
@@ -63,8 +63,8 @@ const CourseTable = ({courses} : {courses : {
                                 }
                                 ⚪ {" "}
                                 {formatPlural(course.lessonsCount, {
-                                    singular: "section",
-                                    plural: "sections"})
+                                    singular: "lesson",
+                                    plural: "lessons"})
                                 }
                             </div>
                         </div>

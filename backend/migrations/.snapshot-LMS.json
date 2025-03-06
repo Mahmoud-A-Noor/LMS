@@ -139,8 +139,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": null,
+          "default": "0",
           "mappedType": "integer"
         },
         "created_at": {
@@ -211,7 +212,7 @@
             "id"
           ],
           "referencedTableName": "courses",
-          "deleteRule": "CASCADE",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -732,6 +733,31 @@
           "length": 255,
           "mappedType": "string"
         },
+        "stripe_payment_intent_id": {
+          "name": "stripe_payment_intent_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('pending','paid','refunded')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'pending'",
+          "enumItems": [
+            "pending",
+            "paid",
+            "refunded"
+          ],
+          "mappedType": "enum"
+        },
         "refunded_at": {
           "name": "refunded_at",
           "type": "datetime",
@@ -799,6 +825,16 @@
         },
         {
           "columnNames": [
+            "stripe_payment_intent_id"
+          ],
+          "composite": false,
+          "keyName": "purchases_stripe_payment_intent_id_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
             "user_id"
           ],
           "composite": false,
@@ -840,7 +876,7 @@
             "id"
           ],
           "referencedTableName": "users",
-          "deleteRule": "RESTRICT",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         },
         "purchases_product_id_foreign": {
@@ -853,7 +889,7 @@
             "id"
           ],
           "referencedTableName": "products",
-          "deleteRule": "RESTRICT",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },
@@ -1014,14 +1050,14 @@
           "mappedType": "datetime"
         }
       },
-      "name": "user_course_access",
+      "name": "user_lesson_completes",
       "indexes": [
         {
           "columnNames": [
             "user_id"
           ],
           "composite": false,
-          "keyName": "user_course_access_user_id_index",
+          "keyName": "user_lesson_completes_user_id_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -1031,7 +1067,7 @@
             "lesson_id"
           ],
           "composite": false,
-          "keyName": "user_course_access_lesson_id_index",
+          "keyName": "user_lesson_completes_lesson_id_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -1050,12 +1086,12 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "user_course_access_user_id_foreign": {
-          "constraintName": "user_course_access_user_id_foreign",
+        "user_lesson_completes_user_id_foreign": {
+          "constraintName": "user_lesson_completes_user_id_foreign",
           "columnNames": [
             "user_id"
           ],
-          "localTableName": "user_course_access",
+          "localTableName": "user_lesson_completes",
           "referencedColumnNames": [
             "id"
           ],
@@ -1063,12 +1099,12 @@
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
-        "user_course_access_lesson_id_foreign": {
-          "constraintName": "user_course_access_lesson_id_foreign",
+        "user_lesson_completes_lesson_id_foreign": {
+          "constraintName": "user_lesson_completes_lesson_id_foreign",
           "columnNames": [
             "lesson_id"
           ],
-          "localTableName": "user_course_access",
+          "localTableName": "user_lesson_completes",
           "referencedColumnNames": [
             "id"
           ],

@@ -25,7 +25,7 @@ export class Course {
 
 
     
-    @OneToMany(() => CourseSection, section => section.course, { cascade: [Cascade.PERSIST, Cascade.REMOVE] })
+    @OneToMany(() => CourseSection, section => section.course, {orphanRemoval: true  })
     sections = new Collection<CourseSection>(this);
 
     @ManyToMany(() => Product, product => product.courses)

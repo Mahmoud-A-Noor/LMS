@@ -28,7 +28,7 @@ export default function LoginForm() {
     setLoading(true);
     try {
       await login(data.email, data.password)
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (error: any) {
       alertError(error as string);
     } finally {

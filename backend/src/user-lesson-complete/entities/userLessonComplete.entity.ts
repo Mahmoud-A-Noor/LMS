@@ -2,7 +2,7 @@ import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { User } from "../../users/entities/user.entity";
 import { Lesson } from "../../lessons/entities/lesson.entity";
 
-@Entity({ tableName: 'user_course_access' })
+@Entity({ tableName: 'user_lesson_completes' })
 export class UserLessonComplete {
 
     @ManyToOne(() => User, { fieldName: 'user_id', primary: true, deleteRule: 'cascade' })

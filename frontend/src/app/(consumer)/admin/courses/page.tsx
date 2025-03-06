@@ -1,4 +1,4 @@
-import CourseTable from '@/components/features/CourseTable'
+import CourseTable from '@/components/features/tables/CourseTable'
 import { Button } from '@/components/ui/button'
 import PageHeader from '@/components/ui/PageHeader'
 import Link from 'next/link'

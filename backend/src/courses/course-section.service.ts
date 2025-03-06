@@ -26,7 +26,7 @@ export class CoursesSectionService {
         status: createCourseSectionDto.status,
         course,
     });
-    await this.courseSectionRepository.getEntityManager().flush();
+    await this.courseSectionRepository.getEntityManager().persistAndFlush(courseSection);
     return courseSection;
   }
 
@@ -43,7 +43,7 @@ export class CoursesSectionService {
     if (!courseSection) throw new NotFoundException("Course Section couldn't be found");;
 
     this.courseSectionRepository.assign(courseSection, updateCourseSectionDto);
-    await this.courseSectionRepository.getEntityManager().flush();
+    await this.courseSectionRepository.getEntityManager().persistAndFlush(courseSection);
     
     return courseSection;
   }

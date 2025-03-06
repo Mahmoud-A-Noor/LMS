@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/customExceptionFilter';
+import { raw } from 'express';
 
 
 async function bootstrap() {
@@ -14,17 +15,12 @@ async function bootstrap() {
       process.env.FRONTEND_URL,
     ],
     credentials: true,
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'Accept',
-      'Cookie',
-      'Set-Cookie',
-    ],
-    exposedHeaders: ['Set-Cookie', 'Cookie'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  });
+  });  
+  
+  app.use('/stripe/webhook', raw({ type: 'application/json' }));
+  app.use("/stripe-checkout/webhook", raw({ type: "application/json" }));
+  app.use('/stripe-custom/webhook', raw({ type: 'application/json' }));
+  
   // app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(
     new ValidationPipe({

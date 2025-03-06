@@ -10,6 +10,7 @@ import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [UsersModule, forwardRef(() => ProductsModule), MikroOrmModule.forFeature([Purchase, User, Product])],
+  exports: [PurchasesService],
   controllers: [PurchasesController],
   providers: [PurchasesService],
 })

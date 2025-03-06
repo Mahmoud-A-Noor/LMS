@@ -1,7 +1,7 @@
 "use client";
 import { env } from "@/env/env.mjs";
 import { AuthState } from "@/types/auth-state";
-import API, { setLogoutFunction } from "@/utils/api";
+import API from "@/utils/apiConfig";
 import axios from "axios";
 import { create } from "zustand";
 import { persist, createJSONStorage  } from "zustand/middleware";
@@ -15,7 +15,7 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         try {
           set({ loading: true });
-          const res = await axios.post(`${env.NEXT_PUBLIC_API_URL}/auth/login`, { email, password });
+          const res = await API.post(`${env.NEXT_PUBLIC_API_URL}/auth/login`, { email, password });
           if (res.status === 200) {
             set({ user: res.data.user, loading: false });
           }
@@ -46,6 +46,7 @@ export const useAuthStore = create<AuthState>()(
         } finally {
           set({ user: null, loading: false });
           localStorage.removeItem("auth-storage");
+          window.location.href = "/login";
         }
       },
 
@@ -75,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-setLogoutFunction(useAuthStore.getState().logout);
+// setLogoutFunction(useAuthStore.getState().logout);
 // this is an optimized way to use zustand 
 // because when we use this hook inside a component the component will only rerender if the user changes
 export const useUser = () =>  useAuthStore((state) => state.user) ?? null; 

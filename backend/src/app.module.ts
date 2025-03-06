@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, RequestMethod, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { MikroOrmModule } from '@mikro-orm/nestjs';
@@ -16,6 +16,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/Auth.guard';
 import { UserCourseAccessModule } from './user-course-access/user-course-access.module';
 import { UserLessonCompleteModule } from './user-lesson-complete/user-lesson-complete.module';
+import { StripeModule } from './stripe/stripe.module';
+
 
 @Module({
   imports: [
@@ -31,7 +33,8 @@ import { UserLessonCompleteModule } from './user-lesson-complete/user-lesson-com
     UsersModule,
     AuthModule,
     UserCourseAccessModule,
-    UserLessonCompleteModule
+    UserLessonCompleteModule,
+    StripeModule.forRootAsync()
   ],
   controllers: [AppController],
   providers: [AppService,

@@ -23,8 +23,14 @@ export class PurchasesController {
         return this.purchasesService.findAll();
     }
 
+    @Post('/user-own-product')
+    doesUserOwnCourse(@Body() body: {productId: string, userId: string}) {
+        return this.purchasesService.doesUserOwnCourse(body);
+    }
+
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.purchasesService.findOne(id);
     }
+
 }

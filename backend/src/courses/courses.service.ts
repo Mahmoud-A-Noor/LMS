@@ -23,7 +23,7 @@ export class CoursesService {
 
   async create(createCourseDto: CreateCourseDto): Promise<Course> {
     const course = this.courseRepository.create(createCourseDto);
-    await this.courseRepository.getEntityManager().flush();
+    await this.courseRepository.getEntityManager().persistAndFlush(course);
     return course;
   }
 
@@ -70,7 +70,7 @@ export class CoursesService {
     if (!course) throw new NotFoundException(`Course could not be found`);
 
     this.courseRepository.assign(course, updateCourseDto);
-    await this.courseRepository.getEntityManager().flush();
+    await this.courseRepository.getEntityManager().persistAndFlush(course);
     
     return course;
   }

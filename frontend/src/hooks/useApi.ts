@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react";
-import API from "@/utils/api";
+import API from "@/utils/apiConfig";
 
 export function useApi<T>(endpoint: string, method: "GET" | "POST" | "PUT" | "DELETE") {
   const [data, setData] = useState<any | null>(null);

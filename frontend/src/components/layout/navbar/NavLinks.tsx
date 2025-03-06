@@ -21,7 +21,7 @@ const NavLinks = ({smallScreen = false}) => {
       ]
     else if(user.role === "user")
       navigation = [
-        { name: 'My Courses', href: '/courses', current: false },
+        { name: 'My Courses', href: '/courses', current: true },
         { name: 'Purchase History', href: 'purchases', current: false },
       ]
 

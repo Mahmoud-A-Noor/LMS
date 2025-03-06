@@ -10,6 +10,7 @@ import { Purchase } from '../purchases/entities/purchase.entity';
 
 @Module({
   imports: [MikroOrmModule.forFeature([Product, Course, Purchase]), CoursesModule, forwardRef(() => PurchasesModule)],
+  exports: [ProductsService],
   providers: [ProductsService],
   controllers: [ProductsController]
 })

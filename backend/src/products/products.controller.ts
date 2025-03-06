@@ -17,9 +17,16 @@ export class ProductsController {
         return this.productsService.create(createProductDto);
     }
 
+    @UseGuards(RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Get()
     findAll() {
         return this.productsService.findAll();
+    }
+
+    @Get("/public")
+    findAllPublic() {
+        return this.productsService.findAllPublic();
     }
 
     @Get(':id')

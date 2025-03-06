@@ -1,6 +1,7 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
+import { Entity, Enum, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { Product } from "../../products/entities/product.entity";
 import { User } from "../../users/entities/user.entity";
+import { PurchaseStatus } from "../../common/enums/purchase.enum";
 
 @Entity({tableName: "purchases"})
 export class Purchase {
@@ -18,9 +19,15 @@ export class Purchase {
         image_url: string;
     };
 
-    @Property({type: "string", nullable: false, unique: true})
-    stripeSessionId!: string;
+    @Property({type: "string", unique: true})
+    stripeSessionId: string;
+
+    @Property({type: "string", nullable: true, unique: true})
+    stripePaymentIntentId: string;
     
+    @Enum({ items: () => PurchaseStatus, default: PurchaseStatus.PENDING})
+    status: PurchaseStatus;
+
     @Property({ type: 'timestamp', nullable: true})
     refundedAt: Date;
 
@@ -31,9 +38,9 @@ export class Purchase {
     updatedAt: Date;
 
 
-    @ManyToOne(() => User, { fieldName: 'user_id', deleteRule: 'RESTRICT' })
+    @ManyToOne(() => User, { fieldName: 'user_id', deleteRule: 'set null' })
     user!: User;
 
-    @ManyToOne(() => Product, { fieldName: 'product_id', deleteRule: 'RESTRICT' })
+    @ManyToOne(() => Product, { fieldName: 'product_id', deleteRule: 'set null' })
     product!: Product;
 }

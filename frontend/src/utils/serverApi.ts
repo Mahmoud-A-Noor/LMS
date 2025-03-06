@@ -1,6 +1,6 @@
 "use server";
 
-import API from "@/utils/api";
+import API from "@/utils/serverApiConfig";
 import { AxiosResponse } from "axios";
 
 export async function serverApi<T>(
@@ -13,9 +13,8 @@ export async function serverApi<T>(
     const response: AxiosResponse<T> = await API({
       url: `${endpoint}${param ? `/${param}` : ""}`,
       method,
-      data: payload,
+      data: payload
     });
-
     return { response, error: null };
   } catch (err: any) {
     return { response: null, error: err.response?.data?.message || "Something went wrong" };

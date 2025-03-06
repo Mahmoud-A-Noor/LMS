@@ -15,7 +15,7 @@ export class UsersService {
 
   async create(userDto: CreateUserDto): Promise<User> {
     const user =  this.userRepository.create(userDto);
-    await this.userRepository.getEntityManager().flush();
+    await this.userRepository.getEntityManager().persistAndFlush(user);
     return user
   }
 
@@ -45,7 +45,7 @@ export class UsersService {
     if (!user) return null;
 
     this.userRepository.assign(user, updateUserDto);
-    await this.userRepository.getEntityManager().flush()
+    await this.userRepository.getEntityManager().persistAndFlush(user)
     
     return user;
   }

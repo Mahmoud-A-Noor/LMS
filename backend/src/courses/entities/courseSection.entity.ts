@@ -17,8 +17,11 @@ export class CourseSection {
     @Enum({ items: () => SectionStatus, default: SectionStatus.PRIVATE })
     status: SectionStatus = SectionStatus.PRIVATE;
     
-    @Property({ type: 'int', nullable: true })
-    order: number;
+    // @Property({ type: 'int', nullable: true })
+    // order: number;
+
+    @Property({ type: "integer" })
+    order: number = 0;
 
     @Property({ type: 'timestamp', defaultRaw: 'CURRENT_TIMESTAMP' })
     createdAt: Date = new Date();
@@ -28,9 +31,9 @@ export class CourseSection {
 
 
 
-    @ManyToOne(() => Course, {deleteRule: 'CASCADE'})
+    @ManyToOne(() => Course, {deleteRule: 'cascade'})
     course!: Course;
 
-    @OneToMany(() => Lesson, lesson => lesson.courseSection, { cascade: [Cascade.PERSIST, Cascade.REMOVE] })
+    @OneToMany(() => Lesson, lesson => lesson.courseSection)
     lessons = new Collection<Lesson>(this);
 }
