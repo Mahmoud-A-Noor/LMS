@@ -63,6 +63,16 @@ export class PurchasesService {
             throw new InternalServerErrorException('Failed to retrieve purchases');
         }
     }
+    
+    async findMyPurchases(req: any): Promise<Purchase[]> {
+        try {
+            return await this.purchaseRepository.findAll({
+                where: { user: req.user.id },
+              });
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to retrieve purchases');
+        }
+    }
 
     async doesUserOwnCourse(body: {productId: string, userId: string}) {
         try {

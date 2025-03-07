@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table'
-import { formatPlural } from '@/utils/formatPlural'
+import { formatPlural } from '@/utils/formatters/formatPlural'
 import { Button } from '../../ui/button'
 import Link from 'next/link'
 import { Trash2Icon } from 'lucide-react'

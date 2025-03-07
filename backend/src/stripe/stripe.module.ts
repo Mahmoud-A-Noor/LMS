@@ -11,6 +11,7 @@ import { PurchasesModule } from '../purchases/purchases.module';
 import { UsersModule } from '../users/users.module';
 import { Purchase } from '../purchases/entities/purchase.entity';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { UserCourseAccessModule } from '../user-course-access/user-course-access.module';
 
 //? checkout this medium article to know more about this module ?//
 // https://dev.to/slaknoah/seamless-payment-processing-with-stripe-and-nestjs-3cbg
@@ -21,7 +22,7 @@ export class StripeModule {
     return {
       module: StripeModule,
       controllers: [StripeController, StripeCheckoutController, StripeCustomController],
-      imports: [MikroOrmModule.forFeature([Purchase]), ConfigModule.forRoot(), ProductsModule, PurchasesModule, UsersModule],
+      imports: [MikroOrmModule.forFeature([Purchase]), ConfigModule.forRoot(), ProductsModule, PurchasesModule, UsersModule, UserCourseAccessModule],
       providers: [
         StripeService,
         StripeCheckoutService,

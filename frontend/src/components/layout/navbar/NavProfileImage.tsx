@@ -2,10 +2,12 @@ import React from 'react'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { useAuthStore } from '@/store/authStore'
 import Link from 'next/link'
+import useUser from '@/hooks/server-hooks/useUser'
+import LogoutLink from './LogoutLink'
 
-const NavProfileImage = () => {
+const NavProfileImage = async () => {
 
-    const {user, logout} = useAuthStore()
+    const user = await useUser()
 
   return (
     <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -36,16 +38,7 @@ const NavProfileImage = () => {
                 </Link>
             </MenuItem>
             <MenuItem>
-                <Link
-                href="#"
-                onClick={()=>{
-                    logout()
-                    window.location.href = '/'
-                }}
-                className="block px-4 py-2 text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden"
-                >
-                Sign out
-                </Link>
+                <LogoutLink />
             </MenuItem>
             </MenuItems>
         </Menu>

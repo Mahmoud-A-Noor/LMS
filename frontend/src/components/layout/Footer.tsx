@@ -1,6 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-import { useAuthStore } from '@/store/authStore'
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa"
 
 const Footer = () => {

@@ -9,6 +9,7 @@ import { Purchase } from '../purchases/entities/purchase.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { PurchaseStatus } from '../common/enums/purchase.enum';
+import { UserCourseAccessService } from 'src/user-course-access/user-course-access.service';
 
 @Injectable()
 export class StripeCustomService {
@@ -19,6 +20,7 @@ export class StripeCustomService {
         private readonly configService: ConfigService,
         private readonly productsService: ProductsService,
         private readonly purchasesService: PurchasesService,
+        private readonly userCourseAccessService: UserCourseAccessService,
         private readonly usersService: UsersService,
         @Inject('STRIPE_API_KEY') private readonly apiKey: string,
         @Inject('STRIPE_WEBHOOK_SECRET') private readonly webhookSecret: string,
@@ -30,6 +32,28 @@ export class StripeCustomService {
         this.stripe = new Stripe(this.apiKey, { apiVersion: '2025-02-24.acacia' });
     }
 
+    async getReceiptUrl(paymentIntentId: string): Promise<string | null> {
+        const charges = await this.stripe.charges.list({ payment_intent: paymentIntentId });
+        const latestCharge = charges.data[0];
+        return latestCharge?.receipt_url || null;
+    }
+
+    async refundPayment(paymentIntentId: string) {
+        try {
+          const refund = await this.stripe.refunds.create({
+            payment_intent: paymentIntentId,
+          });
+      
+          console.log("Refund successful:", refund);
+          return refund;
+        } catch (error) {
+          console.error("Refund failed:", error.message);
+          throw error;
+        }
+    }
+
+
+    
     async createCheckoutSession(productId: string, userId: string): Promise<string> {
         try {
             const product = await this.productsService.findById(productId);
@@ -73,8 +97,9 @@ export class StripeCustomService {
                     productId,
                     userId,
                 },
-                success_url: `${this.configService.get<string>('FRONTEND_URL')}/success?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/cancel`,
+                // success_url: `${this.configService.get<string>('FRONTEND_URL')}/success?session_id={CHECKOUT_SESSION_ID}`,
+                success_url: `${this.configService.get<string>('FRONTEND_URL')}/products/${product.id}/purchase-success`,
+                cancel_url: `${this.configService.get<string>('FRONTEND_URL')}/products/${product.id}/purchase-failure`,
             });
 
             
@@ -131,7 +156,7 @@ export class StripeCustomService {
     async handleRefund(paymentIntentId: string) {
         const purchase = await this.purchaseRepository.findOne({
             stripePaymentIntentId: paymentIntentId 
-        });
+        }, {populate: ["user", "product"]});
 
         if (!purchase) {
             throw new NotFoundException('Purchase not found');
@@ -147,6 +172,7 @@ export class StripeCustomService {
 
         if (purchase.status === 'paid') {
             await this.purchasesService.update(purchase.id, {status: PurchaseStatus.REFUNDED, refundedAt: new Date()});
+            await this.userCourseAccessService.removeProductCoursesUserAccess(purchase.user.id, purchase.product.id)
         } else {
             throw new BadRequestException(`Invalid purchase status: ${purchase.status}`);
         }
@@ -222,6 +248,8 @@ export class StripeCustomService {
             status: PurchaseStatus.PAID,
             stripePaymentIntentId
           })
+
+          await this.userCourseAccessService.addProductCoursesUserAccess(userId, productId)
 
           return purchase
         } catch (error) {

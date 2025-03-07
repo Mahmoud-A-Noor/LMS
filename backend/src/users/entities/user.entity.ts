@@ -3,11 +3,13 @@ import {
   BeforeUpdate,
   Entity,
   Enum,
+  OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import * as bcrypt from 'bcryptjs';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { UserCourseAccess } from '../../user-course-access/entities/userCourseAccess.entity';
 
 @Entity({ tableName: 'users' })
 export class User {
@@ -45,8 +47,11 @@ export class User {
   })
   updatedAt: Date;
 
+  // @OneToMany(() => UserCourseAccess, (access) => access.user)
+  // courseAccesses!: UserCourseAccess[];
+
   @BeforeCreate()
-  @BeforeUpdate()
+  // @BeforeUpdate()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
   }
@@ -55,5 +60,3 @@ export class User {
     return bcrypt.compare(password, this.password);
   }
 }
-
-export { UserRole };

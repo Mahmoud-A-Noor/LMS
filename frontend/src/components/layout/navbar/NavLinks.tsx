@@ -1,15 +1,15 @@
-"use client"
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
 import React from 'react'
 import { DisclosureButton } from '@headlessui/react'
+import useUser from '@/hooks/server-hooks/useUser';
+import { Navigation } from '@/types/navigation';
 
-const NavLinks = ({smallScreen = false}) => {
+const NavLinks = async ({smallScreen = false}) => {
 
-    const {user} = useAuthStore()
+    const user = await useUser()
 
-
-    let navigation: { name: string, href: string, current: boolean }[] = [];
+    let navigation: Navigation[] = [];
 
     if(!user) navigation = []
     else if(user.role === "admin")

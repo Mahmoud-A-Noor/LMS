@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Image from 'next/image'
 import { Button } from '../ui/button'
 import Link from 'next/link'
-import { formatPrice } from '@/utils/formatPrice'
+import { formatPrice } from '@/utils/formatters/formatPrice'
 
 const ProductCard = ({id, imageUrl, name, priceInDollars, description} : {id: string, imageUrl: string, name: string, priceInDollars: number, description: string}) => {  
 return (

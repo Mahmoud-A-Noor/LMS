@@ -1,4 +1,3 @@
-"use client"
 import React from 'react'
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { FaBars } from "react-icons/fa";

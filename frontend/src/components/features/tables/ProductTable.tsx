@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table'
-import { formatPlural } from '@/utils/formatPlural'
+import { formatPlural } from '@/utils/formatters/formatPlural'
 import { Button } from '../../ui/button'
 import Link from 'next/link'
 import { Badge, EyeIcon, LockIcon, Trash2Icon } from 'lucide-react'
@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/useToast'
 import { useApi } from '@/hooks/useApi'
 import { Product } from '@/types/product'
 import Image from 'next/image'
-import { formatPrice } from '@/utils/formatPrice'
+import { formatPrice } from '@/utils/formatters/formatPrice'
 import { ProductStatus } from '@/enums/ProductStatus'
 
 const ProductTable = ({products} : {products : Product[]}) => {

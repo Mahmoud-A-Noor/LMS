@@ -1,20 +1,11 @@
-"use client"
 import ProductCard from '@/components/features/ProductCard'
 import { Product } from '@/types/product'
-import API from '@/utils/apiConfig'
 import { serverApi } from '@/utils/serverApi'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-const HomePage = () => {
-    const [products, setProducts] = useState([]);
-  
-    useEffect(() => {
-      API
-        .get("/products/public")
-        .then((res) => setProducts(res.data))
-        .catch((err) => console.error(err));
-    }, []);
-
+const HomePage = async () => {
+    const response = await serverApi("/products/public", "GET")
+    const products = response?.response?.data ?? []
   return (
     <div className='container my-6'>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>

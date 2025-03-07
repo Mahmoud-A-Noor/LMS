@@ -3,9 +3,9 @@ import { IsNotEmpty, IsUUID } from 'class-validator';
 export class CreateUserCourseAccessDto {
     @IsUUID()
     @IsNotEmpty()
-    userId: number;
+    userId: string;
 
     @IsUUID()
     @IsNotEmpty()
-    courseId: number;
+    courseId: string;
 }

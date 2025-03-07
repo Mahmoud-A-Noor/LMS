@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils'
 import { Course } from '@/types/course'
 import { Section } from '@/types/section'
 import { User } from '@/types/user'
-import { formatPlural } from '@/utils/formatPlural'
-import { formatPrice } from '@/utils/formatPrice'
+import { formatPlural } from '@/utils/formatters/formatPlural'
+import { formatPrice } from '@/utils/formatters/formatPrice'
 import { serverApi } from '@/utils/serverApi'
 import { VideoIcon } from 'lucide-react'
 import Image from 'next/image'
@@ -21,6 +21,8 @@ const page = async ({params} : {params: Promise<{productId: string}>}) => {
     const {productId} = await params
     const {response, error} = await serverApi(`/products/${productId}`, "GET")
     const user: User | null = await useUser()
+
+    const ownResponse = await serverApi(`/purchases/user-own-product`,"POST", { productId, userId: user?.id })
 
     if(error) {
         console.log(error)
@@ -60,7 +62,21 @@ const page = async ({params} : {params: Promise<{productId: string}>}) => {
                     {product.description}
                 </div>
                 <Suspense fallback={<SkeletonButton className='h-12 w-36' />}>
+                {
+                    ownResponse?.response?.data === true ? 
+                    (
+                        <div>
+                            <Button className="text-xl h-auto py-4 px-8 rounded-lg" disabled>
+                                You Already Own This Product
+                            </Button>
+                            <Link href="/courses" className="text-blue-500 hover:text-blue-700 underline mt-2 block">
+                                Go to Courses
+                            </Link>
+                        </div>
+                    ):
                     <PurchaseButton productId={product.id} userId={user?.id ?? ''} />
+                }
+                    
                 </Suspense>
             </div>
             <div className='relative aspect-video max-w-lg flex-grow'>
