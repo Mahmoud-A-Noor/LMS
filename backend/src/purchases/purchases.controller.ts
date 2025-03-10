@@ -19,6 +19,8 @@ export class PurchasesController {
         return this.purchasesService.create(createPurchaseDto);
     }
 
+    @UseGuards(RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Get()
     findAll() {
         return this.purchasesService.findAll();
@@ -27,6 +29,13 @@ export class PurchasesController {
     @Get("mine")
     findMyPurchases(@Req() req: any){
         return this.purchasesService.findMyPurchases(req);
+    }
+
+    @UseGuards(RolesGuard)
+    @Roles(UserRole.ADMIN)
+    @Get("stats")
+    getTotalSales(){
+        return this.purchasesService.getTotalSales();
     }
 
     @Post('/user-own-product')

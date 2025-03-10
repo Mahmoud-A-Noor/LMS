@@ -4,6 +4,9 @@ import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { Lesson } from './entities/lesson.entity';
 import { CourseSection } from '../courses/entities/courseSection.entity';
+import { User } from '../users/entities/user.entity';
+import { UserCourseAccess } from '../user-course-access/entities/userCourseAccess.entity';
+import { UserLessonComplete } from 'src/user-lesson-complete/entities/userLessonComplete.entity';
 
 @Injectable()
 export class LessonsService {
@@ -26,6 +29,62 @@ export class LessonsService {
 
   async findAll() {
     return await this.em.find(Lesson, {}, { populate: ['courseSection'] });
+  }
+
+  async findPrevious(id: string){
+      const lesson = await this.em.findOne(Lesson, { id });
+      if (!lesson) {
+        throw new NotFoundException('Lesson not found');
+      }
+      
+      const previousLesson = await this.em.findOne(Lesson, {
+        courseSection: lesson.courseSection,
+        order: { $lt: lesson.order },
+      }, { orderBy: { order: 'desc' } });
+      
+      if (!previousLesson) {
+        return null
+      }
+
+      return previousLesson;
+  }
+
+  async findNext(id: string){
+    const lesson = await this.em.findOne(Lesson, { id });
+      if (!lesson) {
+        throw new NotFoundException('Lesson not found');
+      }
+      
+      const nextLesson = await this.em.findOne(Lesson, {
+        courseSection: lesson.courseSection,
+        order: { $gt: lesson.order },
+      }, { orderBy: { order: 'asc' } });
+      
+      if (!nextLesson) {
+        return null;
+      }
+
+      return nextLesson;
+    }
+  async canUserViewLesson(body: { userId: string, lessonId: string }) {
+    const user = await this.em.findOne(User, { id: body.userId });
+    const lesson = await this.em.findOne(Lesson, { id: body.lessonId }, {populate: ["courseSection.course"]});
+    if(user.role === "admin" || lesson.status === "preview") return true
+
+    const userCourseAccess = await this.em.findOne(UserCourseAccess, { user, course: lesson.courseSection.course });
+    if(!userCourseAccess) return false
+
+    return true
+  }
+
+  async isLessonCompleted(body: { userId: string, lessonId: string }) {
+    const user = await this.em.findOne(User, { id: body.userId });
+    const lesson = await this.em.findOne(Lesson, { id: body.lessonId });
+
+    const userLessonComplete = await this.em.findOne(UserLessonComplete, { user, lesson });
+    if(!userLessonComplete) return false
+
+    return true
   }
 
   async findOne(id: string) {

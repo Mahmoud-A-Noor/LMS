@@ -9,6 +9,16 @@ export class UserCourseAccessController {
   async getUserCourses(@Req() req: any){
     return this.userCourseAccessService.getUserCourses(req.user.id);
   }
+  
+  @Post("/have-access")
+  doesUserHaveAccess(@Body() body: {userId: string, courseId: string}){
+      return this.userCourseAccessService.doesUserHaveAccess(body);
+  }
+  
+  @Get("/total-students-courses")
+  async getTotalStudentsAndCourses(){
+      return this.userCourseAccessService.getTotalStudentsAndCourses();
+  }
 
   @Post("/add")
   async addAccess(@Body() body: {userId: string, productId: string}){

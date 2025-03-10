@@ -7,10 +7,12 @@ import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { User } from '../users/entities/user.entity';
 import { Product } from '../products/entities/product.entity';
 import { PurchaseStatus } from '../common/enums/purchase.enum';
+import { EntityManager } from '@mikro-orm/mysql';
 
 @Injectable()
 export class PurchasesService {
     constructor(
+        private readonly em: EntityManager,
         @InjectRepository(Purchase)
         private readonly purchaseRepository: EntityRepository<Purchase>,
         @InjectRepository(User)
@@ -72,6 +74,55 @@ export class PurchasesService {
         } catch (error) {
             throw new InternalServerErrorException('Failed to retrieve purchases');
         }
+    }
+
+    async getTotalSales(){
+        const netSalesResult = await this.em.createQueryBuilder(Purchase, 'p')
+        .select('SUM(p.pricePaidInCents) / 100 as netSales')
+        .where({ status: PurchaseStatus.PAID })
+        .execute('get');
+
+        const netSales = netSalesResult?.netSales || 0;
+
+        // Get total refund value
+        const refundResult = await this.em.createQueryBuilder(Purchase, 'p')
+        .select('SUM(p.pricePaidInCents) / 100 as totalRefunds')
+        .where({ status: PurchaseStatus.REFUNDED })
+        .execute('get');
+
+        const totalRefunds = refundResult?.totalRefunds || 0;
+
+        // Get net purchases count
+        const netPurchasesResult = await this.em.createQueryBuilder(Purchase, 'p')
+        .select('COUNT(*) as netPurchases')
+        .where({ status: PurchaseStatus.PAID })
+        .execute('get');
+
+        const netPurchases = netPurchasesResult?.netPurchases || 0;
+
+        // Get refunded purchases count
+        const refundedPurchasesResult = await this.em.createQueryBuilder(Purchase, 'p')
+        .select('COUNT(*) as refundedPurchases')
+        .where({ status: PurchaseStatus.REFUNDED })
+        .execute('get');
+
+        const refundedPurchases = refundedPurchasesResult?.refundedPurchases || 0;
+
+        // Get average net purchases per customer
+        const avgPurchasesResult = await this.em.createQueryBuilder(Purchase, 'p')
+        .select('COUNT(*) / COUNT(DISTINCT p.user) as avgPurchasesPerCustomer')
+        .where({ status: PurchaseStatus.PAID })
+        .execute('get');
+
+        const avgPurchasesPerCustomer = avgPurchasesResult?.avgPurchasesPerCustomer || 0;
+
+        return {
+            netSales,
+            totalRefunds,
+            netPurchases,
+            refundedPurchases,
+            avgPurchasesPerCustomer,
+        };
     }
 
     async doesUserOwnCourse(body: {productId: string, userId: string}) {

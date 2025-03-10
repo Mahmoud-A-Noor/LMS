@@ -22,9 +22,29 @@ export class LessonsController {
     return this.lessonsService.findAll();
   }
 
+  @Post("can-view-lesson")
+  canUserViewLesson(@Body() body: {userId: string, lessonId: string}) {
+    return this.lessonsService.canUserViewLesson(body);
+  }
+
+  @Post("is-lesson-completed")
+  isLessonCompleted(@Body() body: {userId: string, lessonId: string}) {
+    return this.lessonsService.isLessonCompleted(body);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.lessonsService.findOne(id);
+  }
+
+  @Get(':id/previous')
+  findPrevious(@Param('id') id: string) {
+    return this.lessonsService.findPrevious(id);
+  }
+
+  @Get(':id/next')
+  findNext(@Param('id') id: string) {
+    return this.lessonsService.findNext(id);
   }
 
   @UseGuards(RolesGuard)

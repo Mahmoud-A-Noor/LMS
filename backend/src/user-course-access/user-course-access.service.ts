@@ -1,17 +1,19 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UserCourseAccess } from './entities/userCourseAccess.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityRepository } from '@mikro-orm/mysql';
+import { EntityManager, EntityRepository } from '@mikro-orm/mysql';
 import { CreateUserCourseAccessDto } from './dto/create-user-course-access.dto';
 import { User } from '../users/entities/user.entity';
 import { Product } from '../products/entities/product.entity';
 import { Course } from '../courses/entities/course.entity';
+import { Lesson } from '../lessons/entities/lesson.entity';
 import { UserLessonComplete } from 'src/user-lesson-complete/entities/userLessonComplete.entity';
 
 
 @Injectable()
 export class UserCourseAccessService {
   constructor(
+    private readonly em: EntityManager,
     @InjectRepository(UserCourseAccess)
     private readonly userCourseAccessRepository: EntityRepository<UserCourseAccess>,
     @InjectRepository(Product)
@@ -20,6 +22,8 @@ export class UserCourseAccessService {
     private readonly userRepository: EntityRepository<User>,
     @InjectRepository(Course)
     private readonly courseRepository: EntityRepository<Course>,
+    @InjectRepository(Lesson)
+    private readonly lessonRepository: EntityRepository<Lesson>,
     @InjectRepository(UserLessonComplete)
     private readonly userLessonCompleteRepository: EntityRepository<UserLessonComplete>,
   ) {}
@@ -102,5 +106,32 @@ export class UserCourseAccessService {
           };
       });
   }
+
+  async getTotalStudentsAndCourses() {
+    const userCountQuery = this.em
+    .createQueryBuilder(UserCourseAccess, 'uca')
+    .select('COUNT(DISTINCT uca.user_id) AS userCount');
+
+  const courseCountQuery = this.em
+    .createQueryBuilder(UserCourseAccess, 'uca')
+    .select('COUNT(DISTINCT uca.course_id) AS courseCount');
+
+  const userCount = await userCountQuery.getSingleResult();
+  const courseCount = await courseCountQuery.getSingleResult();
+
+  return {
+    userCount: userCount[0]?.userCount || 0,
+    courseCount: courseCount[0]?.courseCount || 0,
+  };
+  }
+
+  async doesUserHaveAccess(body: {userId: string, courseId: string}) {
+    const user = await this.userRepository.findOne(body.userId);
+    const course = await this.courseRepository.findOne(body.courseId)
+    const haveAccess = this.userCourseAccessRepository.findOne({user, course})
+    if(!haveAccess) return false
+
+    return true    
+}
 
 }

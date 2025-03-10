@@ -26,6 +26,8 @@ export default function RegisterForm() {
 
   const onSubmit = async (data: any) => {
     setLoading(true);
+    console.log(data)
+    console.log(loading)
     try {
       await registerUser(data.username, data.email, data.password)
       alertSuccess("Registration successful!");
